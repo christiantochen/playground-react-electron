@@ -1,12 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-// import PropTypes from 'prop-types'
-import styled from 'styled-components'
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`
+import View from './view'
 
 class Department extends Component {
   constructor(props) {
@@ -16,7 +10,7 @@ class Department extends Component {
   }
 
   render() {
-    return <Wrapper>Department</Wrapper>
+    return <View {...this.props} />
   }
 }
 
