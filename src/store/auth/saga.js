@@ -6,7 +6,8 @@ import { setLoginData } from './actions'
 import { post } from '../../utils/request'
 
 function* loginRequest(action) {
-  const response = yield call(post, '/login', action.data)
+  const { username, password } = action.data
+  const response = yield call(post, '/auth/login', { username, password })
   yield put(setLoginData(response))
 }
 

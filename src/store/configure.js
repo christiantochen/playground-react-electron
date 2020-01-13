@@ -4,10 +4,19 @@
 
 import { createStore, applyMiddleware, compose } from 'redux'
 import { routerMiddleware } from 'connected-react-router'
-import { combineReducers } from 'redux'
+import { persistStore, persistCombineReducers } from 'redux-persist'
+import { createLogger } from 'redux-logger'
 import createSagaMiddleware from 'redux-saga'
 import reducers from './reducers'
 import sagas from './sagas'
+import storage from 'redux-persist/lib/storage'
+
+const config = {
+  key: 'root',
+  storage,
+  blacklist: ['router'],
+  debug: true, //to get useful logging
+}
 
 export default function configureStore(initialState = {}, history) {
   let composeEnhancers = compose
@@ -33,19 +42,19 @@ export default function configureStore(initialState = {}, history) {
   // 1. sagaMiddleware: Makes redux-sagas work
   // 2. routerMiddleware: Syncs the location/URL path to the state
   const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions)
-  const middlewares = [sagaMiddleware, routerMiddleware(history)]
+  const middlewares = [sagaMiddleware, routerMiddleware(history), createLogger()]
 
   const enhancers = [applyMiddleware(...middlewares)]
+  const persistConfig = { enhancers }
 
   const store = createStore(
-    combineReducers({
-      ...reducers,
-    }),
+    persistCombineReducers(config, reducers),
     initialState,
     composeEnhancers(...enhancers)
   )
+  const persistor = persistStore(store, persistConfig, () => {})
 
   sagas.forEach(saga => sagaMiddleware.run(saga))
 
-  return store
+  return { persistor, store }
 }

@@ -1,12 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-import styled from 'styled-components'
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`
+import View from './view'
 
 class Dashboard extends Component {
   constructor(props) {
@@ -16,7 +10,7 @@ class Dashboard extends Component {
   }
 
   render() {
-    return <Wrapper>Dashboard</Wrapper>
+    return <View {...this.props} />
   }
 }
 
@@ -26,7 +20,5 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {}
 }
-
-Dashboard.propTypes = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)

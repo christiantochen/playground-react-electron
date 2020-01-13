@@ -1,7 +1,8 @@
 // import { apiBaseUrl as BASE_URL } from '../../env'
 import { submitRequest, extractJson } from './base'
 
-const BASE_URL = 'https://dspvapps-jkt-01.banpuindo.co.id'
+// const BASE_URL = 'https://dspvapps-jkt-01.banpuindo.co.id'
+const BASE_URL = 'http://localhost:8000'
 
 const getSerializedPayload = payload =>
   Object.keys(payload)

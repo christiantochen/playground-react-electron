@@ -10,19 +10,26 @@ import GlobalStyles from './styles/global'
 import * as serviceWorker from './serviceWorker'
 import history from './store/history'
 import configureStore from './store/configure'
+import { PersistGate } from 'redux-persist/es/integration/react'
 
 const initialState = {}
-const store = configureStore(initialState, history)
+const { persistor, store } = configureStore(initialState, history)
 const MOUNT_NODE = document.getElementById('app')
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./firebase-messaging-sw.js')
+}
 
 ReactDOM.render(
   <Provider store={store}>
-    {/* <ConnectedRouter history={history}> */}
-    <Router history={history}>
-      <Routes />
-      <GlobalStyles />
-    </Router>
-    {/* </ConnectedRouter> */}
+    <PersistGate persistor={persistor}>
+      {/* <ConnectedRouter history={history}> */}
+      <Router history={history}>
+        <Routes />
+        <GlobalStyles />
+      </Router>
+      {/* </ConnectedRouter> */}
+    </PersistGate>
   </Provider>,
   MOUNT_NODE
 )
