@@ -1,11 +1,7 @@
-import 'whatwg-fetch'
-
 // import { apiBaseUrl } from '../../../env'
 import { isTokenSet, getToken } from '../../auth'
 
-const apiBaseUrl = 'https://dspvapps-jkt-01.banpuindo.co.id'
-
-function getRequestParams(method, useJsonHeaders, data, tokenUsed) {
+function getRequestParams(method, useJsonHeaders, data, fetchWithToken) {
   const params = { method }
 
   if (useJsonHeaders) {
@@ -17,7 +13,7 @@ function getRequestParams(method, useJsonHeaders, data, tokenUsed) {
     params.headers = {}
   }
 
-  if (tokenUsed && isTokenSet()) {
+  if (fetchWithToken && isTokenSet()) {
     params.headers.Authorization = `Bearer ${getToken()}`
   }
 
@@ -28,20 +24,20 @@ function getRequestParams(method, useJsonHeaders, data, tokenUsed) {
   return params
 }
 
-export function submitRequest(url, method, useJsonHeaders, data) {
-  return fetch(
-    url,
-    getRequestParams(method, useJsonHeaders, data, url.indexOf(apiBaseUrl) === 0)
-  ).then(
+export async function submitRequest(url, method, useJsonHeaders, data, fetchWithToken) {
+  return fetch(url, getRequestParams(method, useJsonHeaders, data, fetchWithToken)).then(
     res => res,
     () => ({ statusText: '404 (Not Found)' })
   )
 }
 
-export function extractJson(request) {
-  return new Promise((resolve, reject) =>
-    request.then(response =>
-      response.ok ? resolve(response.json()) : reject(new Error(response.statusText))
-    )
-  )
+export async function extractJson(response) {
+  return response.ok
+    ? {
+        data: await response.json().catch(err => {
+          console.error(err)
+          return null
+        }),
+      }
+    : { error: new Error(response.statusText) }
 }

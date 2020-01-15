@@ -1,17 +1,31 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS } from './fixtures'
-import { setAuthData } from '../../utils/auth'
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILED, FCM_UPDATE_REQUEST } from './fixtures'
 
-export function loginRequest(data) {
+export function loginRequest({ username, password }) {
   return {
     type: LOGIN_REQUEST,
-    data,
+    username,
+    password,
   }
 }
 
-export function setLoginData(data) {
-  setAuthData(data)
+export function loginSucceed({ token, refreshToken }) {
   return {
     type: LOGIN_SUCCESS,
-    data,
+    token,
+    refreshToken,
+  }
+}
+
+export function loginFailed(error) {
+  return {
+    type: LOGIN_FAILED,
+    error,
+  }
+}
+
+export function fcmUpdateRequest(fcmToken) {
+  return {
+    type: FCM_UPDATE_REQUEST,
+    fcmToken,
   }
 }

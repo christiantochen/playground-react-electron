@@ -1,13 +1,6 @@
 const TOKEN_FIELD_NAME = 'token'
 const REFRESH_TOKEN_FIELD_NAME = 'refreshToken'
 
-export function setAuthData(data) {
-  const { token, refreshToken } = data
-
-  localStorage.setItem(TOKEN_FIELD_NAME, token)
-  localStorage.setItem(REFRESH_TOKEN_FIELD_NAME, refreshToken)
-}
-
 /**
  * Save a token string in Local Storage
  *
@@ -41,4 +34,20 @@ export function getToken() {
  */
 export function isTokenSet() {
   return getToken() !== null
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_FIELD_NAME)
+}
+
+export function setRefreshToken(token) {
+  localStorage.setItem(REFRESH_TOKEN_FIELD_NAME, token)
+}
+
+export function removeRefreshToken() {
+  localStorage.removeItem(REFRESH_TOKEN_FIELD_NAME)
+}
+
+export function isRefreshTokenSet() {
+  return getRefreshToken() != null
 }

@@ -1,16 +1,22 @@
 import createReducer from '../../lib/createReducer'
-import { LOGIN_SUCCESS, LOGIN_REQUEST } from './fixtures'
+import { LOGIN_SUCCESS, LOGIN_REQUEST, LOGIN_FAILED, FCM_UPDATE_REQUEST } from './fixtures'
 
 const initialState = {
-  token: null,
-  refreshToken: null,
+  username: undefined,
+  password: undefined,
 }
 
 export default createReducer(initialState, {
-  [LOGIN_REQUEST](state) {
-    return { ...state }
+  [LOGIN_REQUEST](state, { username, password }) {
+    return { ...state, username, password }
   },
-  [LOGIN_SUCCESS](state, action) {
-    return { ...state, ...action.data }
+  [LOGIN_SUCCESS](state, { token, refreshToken }) {
+    return { ...state, token, refreshToken }
+  },
+  [LOGIN_FAILED](state, error) {
+    return { ...state, error }
+  },
+  [FCM_UPDATE_REQUEST](state, { fcmToken }) {
+    return { ...state, fcmToken }
   },
 })
