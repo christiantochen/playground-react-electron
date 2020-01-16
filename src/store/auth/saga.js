@@ -15,7 +15,7 @@ function* loginRequest({ username, password }) {
   if (data) {
     setToken(data.token)
     setRefreshToken(data.refreshToken)
-    yield put(loginSucceed(lo.omit(['token', 'refreshToken'])))
+    yield put(loginSucceed(lo.omit(data, ['token', 'refreshToken'])))
   } else {
     yield put(loginFailed(error))
   }

@@ -1,3 +1,4 @@
+import lo from 'lodash'
 import { submitRequest, extractJson } from './base'
 import { setToken, getRefreshToken } from '../auth'
 
@@ -10,15 +11,16 @@ const getSerializedPayload = payload =>
     .map(field => `${field}=${payload[field]}`)
     .join('&')
 
-const wrapper = async ({ request, shouldRefresh, isEmpty, refreshRequest }) => {
-  let response = await request
+const wrapper = async ({ request, shouldRefresh, isEmpty, refreshRequest, retryRequest }) => {
+  let response = await request()
 
   if (shouldRefresh(response)) {
-    const { data } = extractJson(await refreshRequest())
+    const refreshResponse = await refreshRequest()
+    const { data } = await extractJson(refreshResponse)
 
     if (data) {
       setToken(data.token)
-      response = await request
+      response = await retryRequest()
     }
   }
 
@@ -27,12 +29,13 @@ const wrapper = async ({ request, shouldRefresh, isEmpty, refreshRequest }) => {
   return undefined
 }
 
-const wrapWithRefresh = request =>
+const wrapWithRefresh = (promise, args) =>
   wrapper({
-    request,
-    shouldRefresh: ({ status }) => status === 400,
+    request: () => promise.apply(null, args),
+    shouldRefresh: ({ status }) => status === 401,
     isEmpty: ({ status }) => status === 201 || status === 204,
     refreshRequest: refreshRaw,
+    retryRequest: () => promise.apply(null, args),
   })
 
 const getRaw = (path, data = {}, fetchWithToken) =>
@@ -49,10 +52,10 @@ const refreshRaw = () =>
   submitRequest(`${BASE_URL}${REFRESH_TOKEN_URL}`, 'POST', true, { token: getRefreshToken() })
 
 export const get = (path, payload, fetchWithToken) =>
-  wrapWithRefresh(getRaw(path, payload, fetchWithToken))
+  wrapWithRefresh(getRaw, [path, payload, fetchWithToken])
 export const post = (path, payload, fetchWithToken) =>
-  wrapWithRefresh(postRaw(path, payload, fetchWithToken))
+  wrapWithRefresh(postRaw, [path, payload, fetchWithToken])
 export const put = (path, payload, fetchWithToken) =>
-  wrapWithRefresh(putRaw(path, payload, fetchWithToken))
+  wrapWithRefresh(putRaw, [path, payload, fetchWithToken])
 export const remove = (path, payload, fetchWithToken) =>
-  wrapWithRefresh(removeRaw(path, payload, fetchWithToken))
+  wrapWithRefresh(removeRaw, [path, payload, fetchWithToken])
